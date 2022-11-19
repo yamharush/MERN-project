@@ -8,4 +8,6 @@ router.get('/:id', post.getPostById)
 
 router.post('/', post.addNewPost)
 
+router.put('/:id', post.updatePostById)
+
 module.exports = router

@@ -1,4 +1,5 @@
 
+const { findById } = require('../models/post_model.js')
 const Post = require('../models/post_model.js')
 
 const getAllPosts = async (req, res, next) => {
@@ -28,7 +29,6 @@ const getPostById = async (req, res, next) => {
 
 const addNewPost = async (req, res, next) => {
     console.log(req.body)
-
     const post = new Post({
         message: req.body.message,
         sender: req.body.sender
@@ -44,4 +44,22 @@ const addNewPost = async (req, res, next) => {
     }
 }
 
-module.exports = { getAllPosts, addNewPost, getPostById }
+const updatePostById = async (req, res, next) => {
+    console.log("update post by id")
+    console.log(req.body)
+    if ((req.params.id == null) | (req.params.id == undefined)) {
+        res.status(400).send({
+            status: "fail",
+            message: "err.message"
+        })
+    }
+    try {
+        const updatePost = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        console.log("update post in the data base")
+        res.status(200).send(updatePost)
+    } catch (error) {
+        res.status(400).send({ error: "fail to update post in the data base" })
+    }
+}
+
+module.exports = { getAllPosts, addNewPost, getPostById, updatePostById }

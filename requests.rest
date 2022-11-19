@@ -1,10 +1,10 @@
 ###
 GET http://localhost:3000/post
 ###
-GET http://localhost:3000/post?sender=123456
+GET http://localhost:3000/post?sender=12345
 
 ###
-GET http://localhost:3000/post/6362c20cbcb64fa1823f816d
+GET http://localhost:3000/post/63766da7862694717ecaf37d
 
 ###
 
@@ -12,16 +12,17 @@ POST http://localhost:3000/post
 Content-Type: application/json
 
 {
-    "message":"this is my new message",
-    "sender": "123456"
+    "message":"this is my new message 2",
+    "sender": "12345"
 }
 ###
 
-POST http://localhost:3000/message
-
 ###
+PUT http://localhost:3000/post/637924f9e9d851d7fdf595b
+Content-Type: application/json
 
-GET http://localhost:3000/message
-
+{
+    "message":"change message",
+    "sender":"12345"
+}
 ###
-
