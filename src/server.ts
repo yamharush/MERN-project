@@ -13,9 +13,10 @@ db.on('error', error => { console.error(error) })
 db.once('open', () => { console.log('connected to mongo DB') })
 
 import postRouter from './routes/post_route'
-import messageRouter from './routes/message_route'
-
 app.use('/post', postRouter)
-app.use('/message', messageRouter)
+
+import authRouter from './routes/auth_route'
+app.use('/auth', authRouter)
+
 
 export = app
