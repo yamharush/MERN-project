@@ -1,5 +1,5 @@
 import User from '../models/user_model'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -21,11 +21,11 @@ const register = async (req: Request, res: Response) => {
     try {
         const user = await User.findOne({ 'email': email })
         if (user != null) {
-            sendError(res, 'user already registred, try a diffrent name')
+            return sendError(res, 'user already registred, try a diffrent name')
         }
     } catch (err) {
         console.log("error: " + err)
-        sendError(res, 'fail checking user')
+        return sendError(res, 'fail checking user')
     }
     try {
         const salt = await bcrypt.genSalt(10)
@@ -37,7 +37,7 @@ const register = async (req: Request, res: Response) => {
         newUser = await newUser.save()
         res.status(200).send(newUser)
     } catch (err) {
-        sendError(res, 'fail...')
+        return sendError(res, 'fail...')
     }
 }
 
@@ -56,7 +56,7 @@ const login = async (req: Request, res: Response) => {
             { 'expiresIn': process.env.JWT_TOKEN_EXPIRATION }
         )
 
-        return res.status(200).send({ 'accesstoken': accessToken })
+        return res.status(200).send({ 'accessToken': accessToken })
     } catch (err) {
         console.log("error: " + err)
         sendError(res, 'fail checking user')
@@ -67,4 +67,22 @@ const logout = async (req: Request, res: Response) => {
     res.status(400).send({ 'error': "not implemented" })
 }
 
-export = { login, register, logout }
+
+const authenticateMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers['authorization']
+    if (authHeader == null) return sendError(res, 'authentication missing')
+    const token = authHeader.split(' ')[1]
+    if (token == null) return sendError(res, 'authentication missing')
+    try {
+        const user = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        //TODO: fix ts
+        //req.user=user._id
+        console.log("token user: " + user)
+        next()
+    } catch (err) {
+        return sendError(res, 'fail validating token')
+    }
+
+}
+
+export = { login, register, logout, authenticateMiddleware }

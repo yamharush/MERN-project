@@ -14,9 +14,9 @@ mongoose_1.default.connect(process.env.DATABASE_URL); //{ useNewUrlParser: true 
 const db = mongoose_1.default.connection;
 db.on('error', error => { console.error(error); });
 db.once('open', () => { console.log('connected to mongo DB'); });
-const post_route_1 = __importDefault(require("./routes/post_route"));
-app.use('/post', post_route_1.default);
-const auth_route_1 = __importDefault(require("./routes/auth_route"));
-app.use('/auth', auth_route_1.default);
+const post_route_js_1 = __importDefault(require("./routes/post_route.js"));
+app.use('/post', post_route_js_1.default);
+const auth_route_js_1 = __importDefault(require("./routes/auth_route.js"));
+app.use('/auth', auth_route_js_1.default);
 module.exports = app;
 //# sourceMappingURL=server.js.map

@@ -1,5 +1,7 @@
 ###
 GET http://localhost:3000/post
+//Authorization:jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzODI2ZjMyZTU0NTEyYjVkNjgyYTQ5ZiIsImlhdCI6MTY2OTQ5MjUzNCwiZXhwIjoxNjY5NDk2MTM0fQ.gCtV1S5jekI_Mo5bm0I_h0Z1ZQ0myB_yuAQsMtsUcSE
+
 ###
 GET http://localhost:3000/post?sender=12345
 
@@ -9,6 +11,7 @@ GET http://localhost:3000/post/63766da7862694717ecaf37d
 ###
 
 POST http://localhost:3000/post
+Authorization:jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzODI2ZjMyZTU0NTEyYjVkNjgyYTQ5ZiIsImlhdCI6MTY2OTQ5MjUzNCwiZXhwIjoxNjY5NDk2MTM0fQ.gCtV1S5jekI_Mo5bm0I_h0Z1ZQ0myB_yuAQsMtsUcSE
 Content-Type: application/json
 
 {

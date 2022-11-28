@@ -29,12 +29,12 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_model_1.default.findOne({ 'email': email });
         if (user != null) {
-            sendError(res, 'user already registred, try a diffrent name');
+            return sendError(res, 'user already registred, try a diffrent name');
         }
     }
     catch (err) {
         console.log("error: " + err);
-        sendError(res, 'fail checking user');
+        return sendError(res, 'fail checking user');
     }
     try {
         const salt = yield bcrypt_1.default.genSalt(10);
@@ -47,7 +47,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send(newUser);
     }
     catch (err) {
-        sendError(res, 'fail...');
+        return sendError(res, 'fail...');
     }
 });
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,7 +63,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!match)
             return sendError(res, 'incorrect user or password');
         const accessToken = yield jsonwebtoken_1.default.sign({ 'id': user._id }, process.env.ACCESS_TOKEN_SECRET, { 'expiresIn': process.env.JWT_TOKEN_EXPIRATION });
-        return res.status(200).send({ 'accesstoken': accessToken });
+        return res.status(200).send({ 'accessToken': accessToken });
     }
     catch (err) {
         console.log("error: " + err);
@@ -73,5 +73,23 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(400).send({ 'error': "not implemented" });
 });
-module.exports = { login, register, logout };
+const authenticateMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = req.headers['authorization'];
+    if (authHeader == null)
+        return sendError(res, 'authentication missing');
+    const token = authHeader.split(' ')[1];
+    if (token == null)
+        return sendError(res, 'authentication missing');
+    try {
+        const user = yield jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        //TODO: fix ts
+        //req.user=user._id
+        console.log("token user: " + user);
+        next();
+    }
+    catch (err) {
+        return sendError(res, 'fail validating token');
+    }
+});
+module.exports = { login, register, logout, authenticateMiddleware };
 //# sourceMappingURL=auth.js.map

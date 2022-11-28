@@ -12,10 +12,10 @@ const db = mongoose.connection
 db.on('error', error => { console.error(error) })
 db.once('open', () => { console.log('connected to mongo DB') })
 
-import postRouter from './routes/post_route'
+import postRouter from './routes/post_route.js'
 app.use('/post', postRouter)
 
-import authRouter from './routes/auth_route'
+import authRouter from './routes/auth_route.js'
 app.use('/auth', authRouter)
 
 
