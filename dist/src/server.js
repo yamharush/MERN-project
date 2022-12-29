@@ -2,10 +2,17 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+const dotenv_1 = __importDefault(require("dotenv"));
+if (process.env.NODE_ENV == 'test') {
+    dotenv_1.default.config({ path: './.testenv' });
+}
+else {
+    dotenv_1.default.config();
+}
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+const http_1 = __importDefault(require("http"));
+const server = http_1.default.createServer(app);
 const body_parser_1 = __importDefault(require("body-parser"));
 app.use(body_parser_1.default.urlencoded({ extended: true, limit: '1mb' }));
 app.use(body_parser_1.default.json());
@@ -36,5 +43,5 @@ if (process.env.NODE_ENV == "development") {
     const specs = (0, swagger_jsdoc_1.default)(options);
     app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(specs));
 }
-module.exports = app;
+module.exports = server;
 //# sourceMappingURL=server.js.map

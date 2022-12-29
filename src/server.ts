@@ -1,7 +1,15 @@
+import dotenv from 'dotenv'
+if (process.env.NODE_ENV == 'test') {
+    dotenv.config({ path: './.testenv' })
+} else {
+    dotenv.config()
+}
+
 import express from 'express'
 const app = express()
-import dotenv from 'dotenv'
-dotenv.config()
+import http from 'http'
+const server = http.createServer(app)
+
 import body_parser from 'body-parser'
 app.use(body_parser.urlencoded({ extended: true, limit: '1mb' }))
 app.use(body_parser.json())
@@ -21,7 +29,6 @@ app.use('/auth', authRouter)
 
 import swaggerUI from "swagger-ui-express"
 import swaggerJsDoc from "swagger-jsdoc"
-
 if (process.env.NODE_ENV == "development") {
     const options = {
         definition: {
@@ -40,4 +47,4 @@ if (process.env.NODE_ENV == "development") {
 }
 
 
-export = app
+export = server

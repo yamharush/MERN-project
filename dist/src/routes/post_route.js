@@ -137,6 +137,6 @@ router.post('/', auth_1.default.authenticateMiddleware, post_1.default.addNewPos
  *               $ref: '#/components/schemas/Post'
  *
  */
-router.put('/:id', auth_1.default.authenticateMiddleware, post_1.default.updatePostById);
+router.put('/:id', auth_1.default.authenticateMiddleware, post_1.default.putPostById);
 module.exports = router;
 //# sourceMappingURL=post_route.js.map

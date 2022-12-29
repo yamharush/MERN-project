@@ -1,5 +1,17 @@
 import Post from '../models/post_model'
 import { Request, Response } from 'express'
+
+const getAllPostsEvent = async () => {
+    console.log("")
+    try {
+        const posts = await Post.find()
+        return { status: 'OK', data: posts }
+    } catch (err) {
+        return { status: 'FAIL', data: "" }
+    }
+
+}
+
 const getAllPosts = async (req: Request, res: Response) => {
     try {
         let posts = {}
@@ -25,11 +37,13 @@ const getPostById = async (req: Request, res: Response) => {
     }
 }
 
+
 const addNewPost = async (req: Request, res: Response) => {
     console.log(req.body)
+
     const post = new Post({
         message: req.body.message,
-        sender: req.body.sender
+        sender: req.body.userId     //extract the user id from the auth 
     })
 
     try {
@@ -37,27 +51,21 @@ const addNewPost = async (req: Request, res: Response) => {
         console.log("save post in db")
         res.status(200).send(newPost)
     } catch (err) {
-        console.log("faile to save post in db")
+        console.log("fail to save post in db")
         res.status(400).send({ 'error': 'fail adding new post to db' })
     }
 }
 
-const updatePostById = async (req: Request, res: Response) => {
-    console.log("update post by id")
-    console.log(req.body)
-    if ((req.params.id == null) || (req.params.id == undefined)) {
-        res.status(400).send({
-            status: "fail",
-            message: "err.message"
-        })
-    }
+
+const putPostById = async (req: Request, res: Response) => {
     try {
-        const updatePost = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        console.log("update post in the data base")
-        res.status(200).send(updatePost)
-    } catch (error) {
-        res.status(400).send({ error: "fail to update post in the data base" })
+        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        res.status(200).send(post)
+    } catch (err) {
+        console.log("fail to update post in db")
+        res.status(400).send({ 'error': 'fail adding new post to db' })
     }
 }
 
-export = { getAllPosts, addNewPost, getPostById, updatePostById }
+
+export = { getAllPosts, addNewPost, getPostById, putPostById, getAllPostsEvent }

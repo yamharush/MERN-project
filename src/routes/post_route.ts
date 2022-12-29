@@ -39,7 +39,7 @@ import auth from '../controllers/auth'
  *     tags: [Post]
  *     security:
  *       - bearerAuth: []
- *     parameters:
+ *     parameters: 
  *       - in: query
  *         name: sender
  *         schema:
@@ -139,6 +139,6 @@ router.post('/', auth.authenticateMiddleware, post.addNewPost)
  *               $ref: '#/components/schemas/Post'
  *  
  */
-router.put('/:id', auth.authenticateMiddleware, post.updatePostById)
+router.put('/:id', auth.authenticateMiddleware, post.putPostById)
 
 export = router

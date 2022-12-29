@@ -12,6 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 const post_model_1 = __importDefault(require("../models/post_model"));
+const getAllPostsEvent = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("");
+    try {
+        const posts = yield post_model_1.default.find();
+        return { status: 'OK', data: posts };
+    }
+    catch (err) {
+        return { status: 'FAIL', data: "" };
+    }
+});
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let posts = {};
@@ -41,7 +51,7 @@ const addNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     console.log(req.body);
     const post = new post_model_1.default({
         message: req.body.message,
-        sender: req.body.sender
+        sender: req.body.userId //extract the user id from the auth 
     });
     try {
         const newPost = yield post.save();
@@ -49,27 +59,19 @@ const addNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send(newPost);
     }
     catch (err) {
-        console.log("faile to save post in db");
+        console.log("fail to save post in db");
         res.status(400).send({ 'error': 'fail adding new post to db' });
     }
 });
-const updatePostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("update post by id");
-    console.log(req.body);
-    if ((req.params.id == null) || (req.params.id == undefined)) {
-        res.status(400).send({
-            status: "fail",
-            message: "err.message"
-        });
-    }
+const putPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const updatePost = yield post_model_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        console.log("update post in the data base");
-        res.status(200).send(updatePost);
+        const post = yield post_model_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).send(post);
     }
-    catch (error) {
-        res.status(400).send({ error: "fail to update post in the data base" });
+    catch (err) {
+        console.log("fail to update post in db");
+        res.status(400).send({ 'error': 'fail adding new post to db' });
     }
 });
-module.exports = { getAllPosts, addNewPost, getPostById, updatePostById };
+module.exports = { getAllPosts, addNewPost, getPostById, putPostById, getAllPostsEvent };
 //# sourceMappingURL=post.js.map
