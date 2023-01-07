@@ -1,35 +1,36 @@
-
-import express from 'express'
-const router = express.Router()
-import post from '../controllers/post'
-import auth from '../controllers/auth'
-/**
-* @swagger
-* tags:
-*   name: Post
-*   description: The Posts API
-*/
+import express from "express";
+const router = express.Router();
+import Post from "../controllers/post";
+import Auth from "../controllers/auth";
+import Request from "../common/request";
 
 /**
-* @swagger
-* components:
-*   schemas:
-*     Post:
-*       type: object
-*       required:
-*         - message
-*         - sender
-*       properties:
-*         message:
-*           type: string
-*           description: The post text
-*         sender:
-*           type: string
-*           description: The sending user id
-*       example:
-*         message: 'this is my new post'
-*         sender: '12342345234556'
-*/
+ * @swagger
+ * tags:
+ *   name: Post
+ *   description: The Posts API
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Post:
+ *       type: object
+ *       required:
+ *         - message
+ *         - sender
+ *       properties:
+ *         message:
+ *           type: string
+ *           description: The post text
+ *         sender:
+ *           type: string
+ *           description: The sending user id
+ *       example:
+ *         message: 'this is my new post'
+ *         sender: '12342345234556'
+ */
 
 /**
  * @swagger
@@ -39,7 +40,7 @@ import auth from '../controllers/auth'
  *     tags: [Post]
  *     security:
  *       - bearerAuth: []
- *     parameters: 
+ *     parameters:
  *       - in: query
  *         name: sender
  *         schema:
@@ -52,13 +53,36 @@ import auth from '../controllers/auth'
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                  $ref: '#/components/schemas/Post'
- *  
+ *
  */
-
-router.get('/', auth.authenticateMiddleware, post.getAllPosts)
-
+router.get("/", Auth.authenticateMiddleware, async (req, res) => {
+    if (req.query.sender == null) {
+        try {
+            const response = await Post.getAllPosts(Request.fromRestRequest(req));
+            response.sendRestResponse(res);
+        } catch (err) {
+            res.status(400).send({
+                status: "fail",
+                message: err.message,
+            });
+        }
+    } else {
+        try {
+            const response = await Post.getPostBySender(
+                Request.fromRestRequest(req),
+                req.query.sender
+            );
+            response.sendRestResponse(res);
+        } catch (err) {
+            res.status(400).send({
+                status: "fail",
+                message: err.message,
+            });
+        }
+    }
+});
 /**
  * @swagger
  * /post/{id}:
@@ -81,9 +105,23 @@ router.get('/', auth.authenticateMiddleware, post.getAllPosts)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
- *  
+ *
  */
-router.get('/:id', auth.authenticateMiddleware, post.getPostById)
+router.get("/:id", Auth.authenticateMiddleware, async (req, res) => {
+    try {
+        const response = await Post.getPostById(
+            Request.fromRestRequest(req),
+            req.params.id
+        );
+        response.sendRestResponse(res);
+    } catch (err) {
+        res.status(400).send({
+            status: "fail",
+            message: err.message,
+        });
+    }
+});
+
 /**
  * @swagger
  * /post:
@@ -105,9 +143,20 @@ router.get('/:id', auth.authenticateMiddleware, post.getPostById)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
- *  
+ *
  */
-router.post('/', auth.authenticateMiddleware, post.addNewPost)
+// router.post("/", auth.authenticateMiddleware, post.addNewPost);
+router.post("/", Auth.authenticateMiddleware, async (req, res) => {
+    try {
+        const response = await Post.addNewPost(Request.fromRestRequest(req));
+        response.sendRestResponse(res);
+    } catch (err) {
+        res.status(400).send({
+            status: "fail",
+            message: err.message,
+        });
+    }
+});
 
 /**
  * @swagger
@@ -123,7 +172,7 @@ router.post('/', auth.authenticateMiddleware, post.addNewPost)
  *         requiered: true
  *         schema:
  *           type: string
- *           description: the updated post id    
+ *           description: the updated post id
  *     requestBody:
  *       required: true
  *       content:
@@ -137,8 +186,20 @@ router.post('/', auth.authenticateMiddleware, post.addNewPost)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
- *  
+ *
  */
-router.put('/:id', auth.authenticateMiddleware, post.putPostById)
+router.put("/:id", Auth.authenticateMiddleware, async (req, res) => {
+    try {
+        const response = await Post.putPostById(
+            Request.fromRestRequest(req), req.params.id
+        );
+        response.sendRestResponse(res);
+    } catch (err) {
+        res.status(400).send({
+            status: "fail",
+            message: err.message,
+        });
+    }
+});
 
-export = router
+export = router;

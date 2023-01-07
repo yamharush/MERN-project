@@ -1,71 +1,73 @@
-import Post from '../models/post_model'
-import { Request, Response } from 'express'
+import Post from "../models/post_model";
+import Request from "../common/request";
+import Response from "../common/response";
+import Error from "../common/error";
+// import { Request, Response } from "express";
 
-const getAllPostsEvent = async () => {
-    console.log("")
-    try {
-        const posts = await Post.find()
-        return { status: 'OK', data: posts }
-    } catch (err) {
-        return { status: 'FAIL', data: "" }
-    }
+const addNewPost = async (req) => {
+  console.log(req.body);
+  const msg = req.body.message;
+  const senderMsg = req.body.sender;
+  const sender = req.userId;
+  const post = new Post({
+    message: msg,
+    sender: senderMsg,
+  });
+  try {
+    const newPost = await post.save();
+    return new Response(newPost, sender, null);
+  } catch (err) {
+    return new Response(null, sender, new Error(400, err.message));
+  }
+};
 
-}
+const getAllPosts = async (req) => {
+  const sender = req.userId;
+  try {
+    const posts = await Post.find();
+    return new Response(posts, sender, null);
+  } catch (err) {
+    return new Response(null, sender, new Error(400, err.message));
+  }
+};
 
-const getAllPosts = async (req: Request, res: Response) => {
-    try {
-        let posts = {}
-        if (req.query.sender == null) {
-            posts = await Post.find()
-        } else {
-            posts = await Post.find({ 'sender': req.query.sender })
-        }
-        res.status(200).send(posts)
-    } catch (err) {
-        res.status(400).send({ 'error': "fail to get posts from db" })
-    }
-}
+const getPostById = async (req, id) => {
+  // const id = id;
+  const postId = id;
+  const sender = req.userId;
+  try {
+    const posts = await Post.findById(postId);
+    return new Response(posts, sender, null);
+  } catch (err) {
+    return new Response(null, sender, new Error(400, err.message));
+  }
+};
 
-const getPostById = async (req: Request, res: Response) => {
-    console.log(req.params.id)
+const getPostBySender = async (req, sender) => {
+  try {
+    const posts = await Post.find({ sender: sender });
+    return new Response(posts, req.userId, null);
+  } catch (err) {
+    return new Response(null, req.userId, new Error(400, err.message));
+  }
+};
 
-    try {
-        const posts = await Post.findById(req.params.id)
-        res.status(200).send(posts)
-    } catch (err) {
-        res.status(400).send({ 'error': "fail to get posts from db" })
-    }
-}
+const putPostById = async (req, id) => {
+  const postId = id;
+  const updateMsg = req.body.message
+  const sender = req.userId;
+  try {
+    const post = await Post.findByIdAndUpdate(postId, { message: updateMsg }, { new: true });
+    return new Response(post, sender, null);
+  } catch (err) {
+    return new Response(null, sender, new Error(400, err.message));
+  }
+};
 
-
-const addNewPost = async (req: Request, res: Response) => {
-    console.log(req.body)
-
-    const post = new Post({
-        message: req.body.message,
-        sender: req.body.userId     //extract the user id from the auth 
-    })
-
-    try {
-        const newPost = await post.save()
-        console.log("save post in db")
-        res.status(200).send(newPost)
-    } catch (err) {
-        console.log("fail to save post in db")
-        res.status(400).send({ 'error': 'fail adding new post to db' })
-    }
-}
-
-
-const putPostById = async (req: Request, res: Response) => {
-    try {
-        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        res.status(200).send(post)
-    } catch (err) {
-        console.log("fail to update post in db")
-        res.status(400).send({ 'error': 'fail adding new post to db' })
-    }
-}
-
-
-export = { getAllPosts, addNewPost, getPostById, putPostById, getAllPostsEvent }
+export = {
+  getAllPosts,
+  addNewPost,
+  getPostById,
+  getPostBySender,
+  putPostById
+};
